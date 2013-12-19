@@ -1,0 +1,14 @@
+{% extends 'main/base.html' %}
+{% block title %}Add Dataset{% endblock %}
+{% block body_block %}
+<h1>Add a Dataset</h1>
+<form id="dataset_form" action="/main/add_dataset" method="POST">   
+    {% csrf_token %}
+        {% for d in dataset_form %}
+            {{ d.errors }}
+            {{ d.help_text }} <br>
+            {{ d }} <br>
+        {% endfor %}
+    <input class="btn btn-primary" type="submit" value="Add dataset">
+</form>
+{% endblock %}

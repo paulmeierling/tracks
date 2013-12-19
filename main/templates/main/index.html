@@ -1,0 +1,84 @@
+{% extends 'main/base.html' %}
+{% block body_block %}
+    {% if user.is_authenticated %}
+        <h2>Welcome {{user.username}}</h2>
+        <table class="table">
+            <th>Delete</th>
+            <th>Compare</th>
+            <th>Name</th>
+            <th>Owner</th>
+        {% if own_datasets %}
+            {% for d in own_datasets %}
+                <tr>
+                <td><a><span dataset_id='{{d.pk}}' class="glyphicon glyphicon-minus own"></span></a></td>
+                <td><input type="checkbox" name="compare" value={{d.pk}}></td>
+                <td><a href="/main/{{d.id}}">{{d.name}}</a></td>
+                <td>You</td>
+            {% endfor %}
+        {% endif %}
+        {% if viewing_datasets %}
+            {% for v in viewing_datasets %}
+             <tr>
+                <td><a><span dataset_id='{{v.pk}}' class="glyphicon glyphicon-minus viewing"></span></a></td>
+                <td><input type="checkbox" name="compare" value={{v.pk}}></td>
+                <td><a href="/main/{{v.id}}">{{v.name}}</a></td>
+                <td>{{v.owner}}</td>
+            {% endfor %}
+        {% endif %}
+        <tr>
+            <td></td>
+            <td><a href="/main/add_dataset"><span class="glyphicon glyphicon-plus"></a> <a href="/main/add_dataset">Add a Dataset</a></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><a id="compare_datasets">Compare Datasets</a></td>
+        </tr>
+        </table>
+    {% else %}
+        <p>Please login so you can track your data</p>
+    {% endif %}
+{% endblock %}
+{% block javascript_block %}
+<script>
+$('.glyphicon-minus.own').click(function(){
+    var conf = confirm("Are you sure you want to remove this dataset ?");
+    var dataset_id = $(this).attr("dataset_id");
+    if (conf){
+        $.post("/main/"+dataset_id+"/delete_dataset",{'csrfmiddlewaretoken':"{{ csrf_token }}"},function(data){
+            location.reload();
+        });
+    }
+});
+
+$('.glyphicon-minus.viewing').click(function(){
+    var conf = confirm("Are you sure you want to remove this dataset ?");
+    var dataset_id = $(this).attr("dataset_id");
+    var viewer_id = {{user.id}};
+    if (conf){
+        $.post("/main/"+dataset_id+"/remove_viewer",{'viewer_id':viewer_id, "csrfmiddlewaretoken":"{{csrf_token}}"}, function(data){
+        location.reload();
+    });
+    }
+});
+
+$('#compare_datasets').click(function(){
+    var selected = new Array()
+    
+    $("input:checkbox[name=compare]:checked").each(function() {
+       selected.push($(this).val());
+    });
+
+    if (selected.length < 1 || selected.length > 4){
+         alert("You need to add between 2 and 4 datasets");
+
+    }
+    else{
+        var url = "/main/graph?sets=" + selected;
+        window.location.href = url;
+    }
+    
+      
+});
+
+</script>
+{% endblock %}

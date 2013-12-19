@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+{% block nav_block %}
+<li class="active"><a href="/main/{{dataset.pk}}">{{dataset.name}}</a></li>
+{% endblock %}
+{% block body_block %}
+<h2>{{dataset.name}}</h2>
+<a href="/main/graph?sets={{dataset.pk}}">Graph</a>
+<a href="/main/{{dataset.pk}}/table">Table</a>
+{% if is_owner %}
+<a href="/main/{{dataset.pk}}/share">Share</a>
+{% endif %}
+<p> 
+    <b>Description:</b><br>
+    {{dataset.description}}
+    <br>
+    <b>Owner</b><br>
+    {{dataset.owner}}<br>
+    <b>Viewers</b><br>
+    {% for viewer in dataset.viewers.all%}
+    {{viewer.username}}<br>
+    {% endfor %}
+
+</p>
+
+
+{% endblock %}
+

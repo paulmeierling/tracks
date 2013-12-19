@@ -1,0 +1,55 @@
+{% extends 'main/base.html' %}
+{% block nav_block %}
+<li class="active"><a href="/main/{{dataset.pk}}">{{dataset.name}}</a></li>
+{% endblock %}
+{% block body_block %}
+{% if viewers %}
+Useres Currently watching this dataset
+<ul>
+{% for v in viewers %}
+<a><span viewer_id='{{v.pk}}' class="glyphicon glyphicon-minus"></span></a> {{v}} <br>
+{% endfor %}
+</ul>
+{% else %}
+Currently no one watching this dataset
+{% endif %}
+<hr>
+Add another user:
+<input class="search-query span10" type="text" name="suggestion" value="" id="suggestion">
+<div id="add_users">
+    <ul>
+    </ul>
+</div>
+{% endblock %}
+
+{% block javascript_block %}
+<script>
+$('#suggestion').keyup(function(){
+    var query;
+    query = $(this).val();
+    $.get('/main/{{dataset.id}}/suggest_user',{suggestion : query}, function(data){
+        var html = "";
+        data = eval(data);
+        for (i in data){
+            html = html + "<li><a id='"+data[i]+"'>"+data[i]+"</li> ";
+        }
+         $('#add_users').html(html);
+
+        $('a').click(function(){
+            var username = $(this).attr("id");
+            $.post('/main/{{dataset.id}}/share',{'username' : username, "csrfmiddlewaretoken":"{{csrf_token}}"}, function(data){
+                location.reload();
+            });
+        })
+    });
+});
+
+$('.glyphicon-minus').click(function(){
+    var viewer_id = $(this).attr("viewer_id")
+    $.post('/main/{{dataset.id}}/remove_viewer',{'viewer_id':viewer_id, "csrfmiddlewaretoken":"{{csrf_token}}"}, function(data){
+        location.reload();
+    });
+});
+
+</script>
+{% endblock %}

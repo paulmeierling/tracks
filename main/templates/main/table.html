@@ -1,0 +1,78 @@
+{% extends "main/base.html" %}
+{% block title %}
+Table
+{% endblock %}
+{% block nav_block %}
+<li class="active"><a href="/main/{{dataset.pk}}">{{dataset.name}}</a></li>
+{% endblock %}
+
+{% block body_block %}
+<style type="text/css">
+input{
+    background:transparent;
+    border:0;
+    outline:none;
+    text-align: center;
+}​
+</style>
+
+<h2>{{dataset.name}}</h2>
+
+<form action="/main/{{dataset.pk}}/update_dataset" method="POST">
+{% csrf_token %}
+<table class="table">
+  <tr>
+    <th></th>
+    <th>Date</th>
+    <th>Value</th>
+  </tr>
+  <tr>
+    {% if is_owner %}
+    <td><a><span class="glyphicon glyphicon-plus"></a></span></td>    
+    <td><input id="new_date" name="new_dp" type="date"></td>
+    <td><input name="new_dp"></td>
+    {% endif %}
+  </tr>
+{% for d in data %}
+<tr>
+  {% if is_owner %}
+  <td><a><span class="glyphicon glyphicon-remove"></span></a></td>
+  {% endif %}
+  <td>{{ d.date.day }}.{{ d.date.month }}.{{ d.date.year }}</td>
+  <td><input name="pk_{{d.id}}" value="{{d.value}}"></td>
+</tr>
+{% endfor %}
+
+</table>
+
+{% if is_owner %}
+<input type="submit" value="Save" class="btn btn-lg btn-success">
+{% endif %}
+</form>
+{% endblock %}
+
+{% block javascript_block %}
+<script>
+$(document).ready(function()
+{
+
+  $('.glyphicon-remove').click(function(){
+    $(this).parent().parent().nextAll().find("input").val(-1);
+    $(this).parent().parent().parent().hide();
+  });
+
+  var day = new Date();
+
+  $('#new_date').val(day.toJSON().slice(0,10));
+
+  $('.glyphicon-plus').click(function(){
+      day.setDate(day.getDate()-1);
+      var preset = day.toJSON().slice(0,10);
+      var html = '<tr><td><td><input name="new_dp" type="date" value="'+preset+'"></td><td><input name="new_dp"></td></tr>';
+      $('.table tr:nth-child(2)').after(html);
+  });
+
+
+});
+</script>
+{% endblock %}   

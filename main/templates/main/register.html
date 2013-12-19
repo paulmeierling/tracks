@@ -1,0 +1,19 @@
+{% extends 'main/base.html' %}
+{% block title %}Register{% endblock %}
+{% block body_block %}
+<h1>Register</h1>
+{% if registered %}
+<p>Thank you for registering.</p>
+<p><a href="/main/login">You can now login</a></p>
+{% else %}
+<form id="user_form" action="/main/register" method="POST">   
+    {% csrf_token %}
+        {% for v in user_form%}
+            {{ v.errors }}
+            {{ v.help_text }} <br>
+            {{ v }} <br>
+        {% endfor %}
+    <input class="btn btn-primary" type="submit" value="Register">
+</form>
+{% endif %}
+{% endblock %}

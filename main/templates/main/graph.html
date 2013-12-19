@@ -1,0 +1,78 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block title%}
+Graph
+{% endblock %}
+{% block nav_block %}
+{% endblock %}
+
+{% block body_block %}
+<canvas id="canvas" height="400" width="600"></canvas>
+{% endblock %}
+
+{% block javascript_block %}
+<script type="text/javascript" src="{% static 'js/chart.min.js' %}"></script>
+<script type="text/javascript">
+
+$(document).ready(function()
+{
+var values = {{values}}; 
+var labels = eval("{% autoescape off %}{{labels}}{% endautoescape %}");
+if (values.length < 4){
+    values.push([0]);
+    values.push([0]);
+    values.push([0]);
+}
+
+draw_graph(labels,values);
+
+});
+
+function draw_graph(labels, values){
+    var context = $('#canvas').get(0).getContext('2d');
+    var graph = new Chart(context);
+    var graph_data = {
+        labels : labels,
+        datasets : [
+            {
+                fillColor : "rgba(0,182,79,0.5)",
+                strokeColor : "rgba(0,182,79,1)",
+                pointColor : "rgba(0,182,79,1)",
+                pointStrokeColor : "#fff",
+                data : values[3]
+            },
+            {
+                fillColor : "rgba(255,53,0,0.5)",
+                strokeColor : "rgba(255,53,0,1)",
+                pointColor : "rgba(255,53,0,1)",
+                pointStrokeColor : "#fff",
+                data : values[0]
+            },
+           
+            {
+                fillColor : "rgba(53,21,176,0.5)",
+                strokeColor : "rgba(53,21,176,1)",
+                pointColor : "rgba(53,21,176,1)",
+                pointStrokeColor : "#fff",
+                data : values[2]
+            },
+            {
+                fillColor : "rgba(255,209,0,0.5)",
+                strokeColor : "rgba(255,209,0,1)",
+                pointColor : "rgba(255,209,0,1)",
+                pointStrokeColor : "#fff",
+                data : values[1]
+            }
+          
+        ]
+    }
+    
+    options = {
+        scaleShowGridLines : false,
+    }
+
+    graph.Line(graph_data, options);
+}
+
+</script>
+{% endblock %}
